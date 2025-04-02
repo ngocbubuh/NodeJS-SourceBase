@@ -1,0 +1,16 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch Nodemon",
+      "runtimeExecutable": "npx",
+      "program": "${workspaceFolder}/src/server.ts",
+      "args": [ "nodemon", "--legacy-watch", "--exec", "ts-node", "src/server.ts" ],
+      "restart": true,
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    }
+  ]
+}

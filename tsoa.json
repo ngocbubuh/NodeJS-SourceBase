@@ -1,0 +1,22 @@
+{
+  "entryFile": "src/server.ts",
+  "noImplicitAdditionalProperties": "silently-remove-extras",
+  "controllerPathGlobs": [ "src/controllers/**.ts" ],
+  "spec": {
+    "outputDirectory": "src/config",
+    "specVersion": 3,
+    "securityDefinitions": {
+      "jwt": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "security": [ { "jwt": [] } ]
+  },
+  "routes": {
+    "iocModule": "src/dependency.injection",
+    "routesDir": "src/config",
+    "authenticationModule": "src/config/authentication.ts"
+  }
+}

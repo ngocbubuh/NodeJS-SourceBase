@@ -19,44 +19,34 @@ const expressAuthenticationRecasted = expressAuthentication as (req: ExRequest, 
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
 const models: TsoaRoute.Models = {
-    "Gender": {
+    "SuccessCode": {
         "dataType": "refEnum",
-        "enums": ["male","female"],
+        "enums": ["OPERATION_SUCCESS"],
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "GeneralResponse": {
+        "dataType": "refAlias",
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"data":{"dataType":"any","required":true},"code":{"ref":"SuccessCode","required":true},"message":{"dataType":"string","required":true}},"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "_36_Enums.Gender": {
+        "dataType": "refAlias",
+        "type": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["male"]},{"dataType":"enum","enums":["female"]}],"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Gender": {
+        "dataType": "refAlias",
+        "type": {"ref":"_36_Enums.Gender","validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "_36_Enums.UserRole": {
+        "dataType": "refAlias",
+        "type": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["admin"]},{"dataType":"enum","enums":["user"]}],"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "UserRole": {
-        "dataType": "refEnum",
-        "enums": ["admin","student","parent","coach","hcoach"],
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "BaseUser": {
-        "dataType": "refObject",
-        "properties": {
-            "id": {"dataType":"double"},
-            "firstName": {"dataType":"string","required":true},
-            "lastName": {"dataType":"string","required":true},
-            "email": {"dataType":"string","required":true},
-            "phone": {"dataType":"string","required":true},
-            "age": {"dataType":"double","required":true},
-            "gender": {"ref":"Gender","required":true},
-            "avatar": {"dataType":"string"},
-            "role": {"ref":"UserRole","required":true},
-        },
-        "additionalProperties": false,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "Pagination_BaseUser_": {
-        "dataType": "refObject",
-        "properties": {
-            "currentPage": {"dataType":"double","required":true},
-            "totalPages": {"dataType":"double","required":true},
-            "pageSize": {"dataType":"double","required":true},
-            "totalCount": {"dataType":"double","required":true},
-            "hasPrevious": {"dataType":"boolean","required":true},
-            "hasNext": {"dataType":"boolean","required":true},
-            "items": {"dataType":"array","array":{"dataType":"refObject","ref":"BaseUser"},"required":true},
-        },
-        "additionalProperties": false,
+        "dataType": "refAlias",
+        "type": {"ref":"_36_Enums.UserRole","validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "CreateUserDTO": {
@@ -85,15 +75,6 @@ const models: TsoaRoute.Models = {
             "age": {"dataType":"double","required":true},
             "gender": {"ref":"Gender","required":true},
             "avatar": {"dataType":"string"},
-        },
-        "additionalProperties": false,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "AuthResponse": {
-        "dataType": "refObject",
-        "properties": {
-            "accessToken": {"dataType":"string","required":true},
-            "refreshToken": {"dataType":"string","required":true},
         },
         "additionalProperties": false,
     },
@@ -233,10 +214,46 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsUserController_createUserInternal: Record<string, TsoaRoute.ParameterSchema> = {
+                userData: {"in":"body","name":"userData","required":true,"ref":"CreateUserDTO"},
+        };
+        app.post('/badminton/v1/users/signUpInternal',
+            authenticateMiddleware([{"jwt":["ADMIN"]}]),
+            ...(fetchMiddlewares<RequestHandler>(UserController)),
+            ...(fetchMiddlewares<RequestHandler>(UserController.prototype.createUserInternal)),
+
+            async function UserController_createUserInternal(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsUserController_createUserInternal, request, response });
+
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<UserController>(UserController);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
+
+              await templateService.apiHandler({
+                methodName: 'createUserInternal',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsUserController_createUser: Record<string, TsoaRoute.ParameterSchema> = {
                 userData: {"in":"body","name":"userData","required":true,"ref":"CreateUserDTO"},
         };
-        app.post('/badminton/v1/users',
+        app.post('/badminton/v1/users/signUp',
             ...(fetchMiddlewares<RequestHandler>(UserController)),
             ...(fetchMiddlewares<RequestHandler>(UserController.prototype.createUser)),
 

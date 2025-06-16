@@ -7,109 +7,48 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
-			"Gender": {
+			"SuccessCode": {
+				"enum": [
+					"OPERATION_SUCCESS"
+				],
+				"type": "string"
+			},
+			"GeneralResponse": {
+				"properties": {
+					"data": {},
+					"code": {
+						"$ref": "#/components/schemas/SuccessCode"
+					},
+					"message": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"data",
+					"code",
+					"message"
+				],
+				"type": "object"
+			},
+			"_36_Enums.Gender": {
+				"type": "string",
 				"enum": [
 					"male",
 					"female"
-				],
-				"type": "string"
+				]
 			},
-			"UserRole": {
+			"Gender": {
+				"$ref": "#/components/schemas/_36_Enums.Gender"
+			},
+			"_36_Enums.UserRole": {
+				"type": "string",
 				"enum": [
 					"admin",
-					"student",
-					"parent",
-					"coach",
-					"hcoach"
-				],
-				"type": "string"
+					"user"
+				]
 			},
-			"BaseUser": {
-				"properties": {
-					"id": {
-						"type": "number",
-						"format": "double"
-					},
-					"firstName": {
-						"type": "string"
-					},
-					"lastName": {
-						"type": "string"
-					},
-					"email": {
-						"type": "string"
-					},
-					"phone": {
-						"type": "string"
-					},
-					"age": {
-						"type": "number",
-						"format": "double"
-					},
-					"gender": {
-						"$ref": "#/components/schemas/Gender"
-					},
-					"avatar": {
-						"type": "string"
-					},
-					"role": {
-						"$ref": "#/components/schemas/UserRole"
-					}
-				},
-				"required": [
-					"firstName",
-					"lastName",
-					"email",
-					"phone",
-					"age",
-					"gender",
-					"role"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"Pagination_BaseUser_": {
-				"properties": {
-					"currentPage": {
-						"type": "number",
-						"format": "double"
-					},
-					"totalPages": {
-						"type": "number",
-						"format": "double"
-					},
-					"pageSize": {
-						"type": "number",
-						"format": "double"
-					},
-					"totalCount": {
-						"type": "number",
-						"format": "double"
-					},
-					"hasPrevious": {
-						"type": "boolean"
-					},
-					"hasNext": {
-						"type": "boolean"
-					},
-					"items": {
-						"items": {
-							"$ref": "#/components/schemas/BaseUser"
-						},
-						"type": "array"
-					}
-				},
-				"required": [
-					"currentPage",
-					"totalPages",
-					"pageSize",
-					"totalCount",
-					"hasPrevious",
-					"hasNext",
-					"items"
-				],
-				"type": "object",
-				"additionalProperties": false
+			"UserRole": {
+				"$ref": "#/components/schemas/_36_Enums.UserRole"
 			},
 			"CreateUserDTO": {
 				"properties": {
@@ -190,22 +129,6 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"AuthResponse": {
-				"properties": {
-					"accessToken": {
-						"type": "string"
-					},
-					"refreshToken": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"accessToken",
-					"refreshToken"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
 			"AuthRequest": {
 				"properties": {
 					"email": {
@@ -245,21 +168,17 @@
 				"operationId": "GetUsers",
 				"responses": {
 					"200": {
-						"description": "Ok",
+						"description": "Thông tin người dùng.",
 						"content": {
 							"application/json": {
 								"schema": {
-									"allOf": [
-										{
-											"$ref": "#/components/schemas/BaseUser"
-										}
-									],
-									"nullable": true
+									"$ref": "#/components/schemas/GeneralResponse"
 								}
 							}
 						}
 					}
 				},
+				"description": "Lấy thông tin người dùng theo ID.",
 				"tags": [
 					"User Management"
 				],
@@ -272,6 +191,7 @@
 				],
 				"parameters": [
 					{
+						"description": "ID của người dùng.",
 						"in": "query",
 						"name": "id",
 						"required": true,
@@ -282,48 +202,21 @@
 					}
 				]
 			},
-			"post": {
-				"operationId": "CreateUser",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {}
-							}
-						}
-					}
-				},
-				"tags": [
-					"User Management"
-				],
-				"security": [],
-				"parameters": [],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/CreateUserDTO"
-							}
-						}
-					}
-				}
-			},
 			"put": {
 				"operationId": "UpdateUser",
 				"responses": {
 					"200": {
-						"description": "Ok",
+						"description": "Thông tin người dùng sau khi cập nhật.",
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/BaseUser"
+									"$ref": "#/components/schemas/GeneralResponse"
 								}
 							}
 						}
 					}
 				},
+				"description": "Cập nhật thông tin người dùng (chỉ Admin).",
 				"tags": [
 					"User Management"
 				],
@@ -336,6 +229,7 @@
 				],
 				"parameters": [
 					{
+						"description": "ID của người dùng.",
 						"in": "query",
 						"name": "id",
 						"required": true,
@@ -346,11 +240,13 @@
 					}
 				],
 				"requestBody": {
+					"description": "Dữ liệu mới cần cập nhật.",
 					"required": true,
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/UpdateUserDTO"
+								"$ref": "#/components/schemas/UpdateUserDTO",
+								"description": "Dữ liệu mới cần cập nhật."
 							}
 						}
 					}
@@ -360,16 +256,17 @@
 				"operationId": "DeleteUser",
 				"responses": {
 					"200": {
-						"description": "Ok",
+						"description": "Kết quả xóa người dùng.",
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/BaseUser"
+									"$ref": "#/components/schemas/GeneralResponse"
 								}
 							}
 						}
 					}
 				},
+				"description": "Xóa người dùng theo ID (chỉ Admin).",
 				"tags": [
 					"User Management"
 				],
@@ -382,6 +279,7 @@
 				],
 				"parameters": [
 					{
+						"description": "ID của người dùng cần xóa.",
 						"in": "query",
 						"name": "id",
 						"required": true,
@@ -398,21 +296,17 @@
 				"operationId": "GetUsersByEmail",
 				"responses": {
 					"200": {
-						"description": "Ok",
+						"description": "Thông tin người dùng.",
 						"content": {
 							"application/json": {
 								"schema": {
-									"allOf": [
-										{
-											"$ref": "#/components/schemas/BaseUser"
-										}
-									],
-									"nullable": true
+									"$ref": "#/components/schemas/GeneralResponse"
 								}
 							}
 						}
 					}
 				},
+				"description": "Lấy thông tin người dùng theo email.",
 				"tags": [
 					"User Management"
 				],
@@ -425,6 +319,7 @@
 				],
 				"parameters": [
 					{
+						"description": "Email của người dùng.",
 						"in": "path",
 						"name": "email",
 						"required": true,
@@ -440,16 +335,17 @@
 				"operationId": "GetAllUsers",
 				"responses": {
 					"200": {
-						"description": "Ok",
+						"description": "Danh sách người dùng với phân trang.",
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/Pagination_BaseUser_"
+									"$ref": "#/components/schemas/GeneralResponse"
 								}
 							}
 						}
 					}
 				},
+				"description": "Lấy danh sách tất cả người dùng với phân trang.",
 				"tags": [
 					"User Management"
 				],
@@ -462,6 +358,7 @@
 				],
 				"parameters": [
 					{
+						"description": "Chỉ số trang.",
 						"in": "query",
 						"name": "pageIndex",
 						"required": false,
@@ -471,6 +368,7 @@
 						}
 					},
 					{
+						"description": "Kích thước trang.",
 						"in": "query",
 						"name": "pageSize",
 						"required": false,
@@ -482,21 +380,98 @@
 				]
 			}
 		},
-		"/badminton/v1/users/me": {
-			"put": {
-				"operationId": "UpdateCurrentUser",
+		"/badminton/v1/users/signUpInternal": {
+			"post": {
+				"operationId": "CreateUserInternal",
 				"responses": {
 					"200": {
-						"description": "Ok",
+						"description": "Thông tin người dùng vừa tạo.",
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/BaseUser"
+									"$ref": "#/components/schemas/GeneralResponse"
 								}
 							}
 						}
 					}
 				},
+				"description": "Đăng ký tài khoản mới (chỉ admin)",
+				"tags": [
+					"User Management"
+				],
+				"security": [
+					{
+						"jwt": [
+							"ADMIN"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"description": "Dữ liệu người dùng cần tạo.",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CreateUserDTO",
+								"description": "Dữ liệu người dùng cần tạo."
+							}
+						}
+					}
+				}
+			}
+		},
+		"/badminton/v1/users/signUp": {
+			"post": {
+				"operationId": "CreateUser",
+				"responses": {
+					"200": {
+						"description": "Thông tin người dùng vừa tạo.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GeneralResponse"
+								}
+							}
+						}
+					}
+				},
+				"description": "Đăng ký tài khoản mới (auto role: user)",
+				"tags": [
+					"User Management"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"description": "Dữ liệu người dùng cần tạo.",
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CreateUserDTO",
+								"description": "Dữ liệu người dùng cần tạo."
+							}
+						}
+					}
+				}
+			}
+		},
+		"/badminton/v1/users/me": {
+			"put": {
+				"operationId": "UpdateCurrentUser",
+				"responses": {
+					"200": {
+						"description": "Thông tin người dùng sau khi cập nhật.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GeneralResponse"
+								}
+							}
+						}
+					}
+				},
+				"description": "Cập nhật thông tin của bản thân.",
 				"tags": [
 					"User Management"
 				],
@@ -507,11 +482,13 @@
 				],
 				"parameters": [],
 				"requestBody": {
+					"description": "Dữ liệu mới cần cập nhật.",
 					"required": true,
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/UpdateUserDTO"
+								"$ref": "#/components/schemas/UpdateUserDTO",
+								"description": "Dữ liệu mới cần cập nhật."
 							}
 						}
 					}
@@ -523,27 +500,30 @@
 				"operationId": "Login",
 				"responses": {
 					"200": {
-						"description": "Ok",
+						"description": "Thông tin xác thực và token.",
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/AuthResponse"
+									"$ref": "#/components/schemas/GeneralResponse"
 								}
 							}
 						}
 					}
 				},
+				"description": "Đăng nhập người dùng.",
 				"tags": [
 					"Authentication"
 				],
 				"security": [],
 				"parameters": [],
 				"requestBody": {
+					"description": "Thông tin đăng nhập.",
 					"required": true,
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/AuthRequest"
+								"$ref": "#/components/schemas/AuthRequest",
+								"description": "Thông tin đăng nhập."
 							}
 						}
 					}
@@ -555,21 +535,17 @@
 				"operationId": "GetCurrentLogin",
 				"responses": {
 					"200": {
-						"description": "Ok",
+						"description": "Thông tin người dùng.",
 						"content": {
 							"application/json": {
 								"schema": {
-									"allOf": [
-										{
-											"$ref": "#/components/schemas/BaseUser"
-										}
-									],
-									"nullable": true
+									"$ref": "#/components/schemas/GeneralResponse"
 								}
 							}
 						}
 					}
 				},
+				"description": "Lấy thông tin người dùng hiện tại.",
 				"tags": [
 					"Authentication"
 				],

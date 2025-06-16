@@ -21,10 +21,10 @@ model user {
   emailVerified Boolean
   phone      String
   age        Int
-  gender     String
+  gender     Gender
   avatar     String?
   password   String
-  role       String
+  role       UserRole
   //Start Of info-field => Use in every entity
   createBy  String?
   createAt  DateTime @default(now())
@@ -34,4 +34,14 @@ model user {
   //End Of info-field
   //Start Of Relationship field
   //End Of Relationship field
+}
+
+enum Gender {
+  male
+  female
+}
+
+enum UserRole {
+  admin
+  user
 }

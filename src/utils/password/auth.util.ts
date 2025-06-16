@@ -1,15 +1,16 @@
-import { ErrorResponse } from "../../business_objects/error.response";
 import { AuthResponse, User } from "../../entities/user";
-import jwt, { SignOptions } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import config, { AuthConfig } from "../environments/environment";
 import * as crypto from "crypto";
+import { ErrorResponseV2 } from "../../business_objects/error.response";
+import { ErrorCode } from "../enums/enums";
 
 export class AuthUtil {
     private static readonly config: AuthConfig = config.auth;
 
     public static generateAuthToken(userData: User): AuthResponse {
         if (!userData.email || !userData.role) {
-            throw new ErrorResponse("User data is corrupted!");
+            throw new ErrorResponseV2(ErrorCode.MISSING_REQUIRED_DATA);
         }
         return {
             accessToken: this.generateToken(userData, "access", this.config.accessTokenExpires),

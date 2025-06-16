@@ -1,8 +1,8 @@
-import { Gender, UserRole } from "../utils/enums/enums";
 import { BaseEntity } from "./base/base.entity";
-import { IsString, MinLength, MaxLength, IsNotEmpty, Matches, IsDefined, ValidateIf, Equals, IsNumber, IsEmail, IsPhoneNumber, IsEnum } from "class-validator";
-import { Exclude, Expose, Transform } from "class-transformer";
-import exp from "node:constants";
+import { IsString, MinLength, IsNumber, IsEmail, IsPhoneNumber, IsEnum } from "class-validator";
+import { Match } from "../utils/password/validate";
+import { Gender, UserRole } from "@prisma/client";
+import { Expose } from "class-transformer";
 
 export class User extends BaseEntity {
     @Expose()
@@ -21,7 +21,7 @@ export class User extends BaseEntity {
     @Expose()
     gender!: Gender;
     @Expose()
-    avatar?: string; //Contain link to the image (Firebase, ...)
+    avatar?: string | null; //Contain link to the image (Firebase, ...)
     @Expose()
     role!: UserRole; //Set fixed role instead of having a Role table
     @Expose()
@@ -92,6 +92,7 @@ export class CreateUserDTO {
     password!: string;
     @IsString()
     @MinLength(7, { message: "Password must be at least 7 characters long" })
+    @Match("password")
     confirmPassword?: string;
 }
 

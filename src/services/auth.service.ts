@@ -1,10 +1,13 @@
 import { inject, injectable } from "inversify";
-import { AuthRequest, AuthResponse, RefreshTokenRequest, User } from "../entities/user";
+import { AuthRequest, AuthResponse, RefreshTokenRequest } from "../entities/user";
 import { IUserRepository } from "../repositories/interfaces/iuser.repository";
 import { IAuthService } from "./interfaces/iauth.service";
 import { PasswordUtil } from "../utils/password/password.util";
-import { ErrorResponse } from "../business_objects/error.response";
+import { ErrorResponseV2 } from "../business_objects/error.response";
 import { AuthUtil } from "../utils/password/auth.util";
+import { ErrorCode } from "../utils/enums/enums";
+import config from "../utils/environments/environment";
+import * as jwt from "jsonwebtoken";
 
 @injectable()
 export class AuthService implements IAuthService {
@@ -12,20 +15,36 @@ export class AuthService implements IAuthService {
 
     public async login(loginData: AuthRequest): Promise<AuthResponse> {
         var user = await this.userRepository.getByEmail(loginData.email);
-        if (!user) {
-            throw new ErrorResponse("Incorrect email or password!"); //Tuong lai lam` language util
+        if (!user || !user.id) {
+            throw new ErrorResponseV2(ErrorCode.INVALID_CREDENTIALS);
         }
         else if (user.delFlag) {
-            throw new ErrorResponse("Your account has been suspended!");
+            throw new ErrorResponseV2(ErrorCode.DELETED_USER);
         }
         var isValidPassword = await PasswordUtil.comparePassword(loginData.password, user.password);
         if (!isValidPassword) {
-            throw new ErrorResponse("Incorrect email or password!");
+            throw new ErrorResponseV2(ErrorCode.INVALID_CREDENTIALS);
         }
         return AuthUtil.generateAuthToken(user);
     }
 
-    refreshToken(refreshData: RefreshTokenRequest): Promise<AuthResponse> {
-        throw new Error("Method not implemented.");
+    public async refreshToken(refreshData: RefreshTokenRequest): Promise<AuthResponse> {
+        try {
+            var tokenData = jwt.verify(refreshData.refreshToken, config.auth.jwtSecret) as { email: string, type: string };
+            if (!tokenData.email && tokenData.type == "refresh") {
+                var user = await this.userRepository.getByEmail(tokenData.email);
+                if (!user || !user.id) {
+                    throw new ErrorResponseV2(ErrorCode.INVALID_TOKEN_CLAIM);
+                }
+                return AuthUtil.generateAuthToken(user);
+            } else {
+                throw new ErrorResponseV2(ErrorCode.INVALID_TOKEN_TYPE);
+            }
+        } catch (error) {
+            if (error instanceof jwt.TokenExpiredError) {
+                throw new ErrorResponseV2(ErrorCode.EXPIRED_TOKEN);
+            }
+            throw new ErrorResponseV2(ErrorCode.INVALID_REQUEST);
+        }
     }
 }

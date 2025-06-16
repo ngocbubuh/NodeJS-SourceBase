@@ -3,9 +3,10 @@ import { IUserService } from "./interfaces/iuser.service";
 import { IUserRepository } from "../repositories/interfaces/iuser.repository";
 import { CreateUserDTO, BaseUser, User, UpdateUserDTO } from "../entities/user";
 import { PasswordUtil } from "../utils/password/password.util";
-import { instanceToInstance, plainToClass, plainToInstance } from "class-transformer";
-import { ErrorResponse } from "../business_objects/error.response"
+import { plainToClass, plainToInstance } from "class-transformer";
+import { ErrorResponseV2 } from "../business_objects/error.response"
 import { Pagination, PaginationParameter } from "../business_objects/pagination";
+import { ErrorCode } from "../utils/enums/enums";
 
 @injectable()
 export class UserService implements IUserService {
@@ -36,7 +37,7 @@ export class UserService implements IUserService {
     public async updateUsers(id: number, newData: UpdateUserDTO): Promise<BaseUser> {
         var user = await this.userRepository.getById(id);
         if (!user) {
-            throw new ErrorResponse("User not found!")
+            throw new ErrorResponseV2(ErrorCode.NOT_FOUND_USER);
         }
         return plainToClass(BaseUser, await this.userRepository.update(id, newData), { excludeExtraneousValues: true });
     }
@@ -44,7 +45,7 @@ export class UserService implements IUserService {
     public async updateCurrentUsers(email: string, newData: UpdateUserDTO): Promise<BaseUser> {
         var user = await this.userRepository.getByEmail(email);
         if (!user || !user.id) {
-            throw new ErrorResponse("User not found!")
+            throw new ErrorResponseV2(ErrorCode.NOT_FOUND_USER);
         }
         return plainToClass(BaseUser, await this.userRepository.update(user.id, newData), { excludeExtraneousValues: true });
     }

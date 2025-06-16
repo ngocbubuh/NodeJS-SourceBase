@@ -1,5 +1,4 @@
 import dotenv from "dotenv";
-import nodemailer, { Transporter } from "nodemailer";
 import path from "path";
 
 // Load environment-specific .env file
@@ -14,12 +13,7 @@ if (result.error) {
     throw result.error;
 }
 
-// Debug loaded values
-console.log("Loaded ENV variables:");
-console.log("DB_TYPE:", process.env.DB_TYPE);
-
 export interface DatabaseConfig {
-    type: "local" | "cloud";
     connectionString?: string;
     ssl: boolean;
 }
@@ -36,36 +30,13 @@ export interface Config {
     port: number;
     database: DatabaseConfig;
     auth: AuthConfig;
-    mailer: Transporter;
 }
 
 function getDatabaseConfig(): DatabaseConfig {
-    const dbType = process.env.DB_TYPE || "local";
-    if (dbType === "cloud") {
-        return {
-            type: "cloud",
-            connectionString: process.env.DATABASE_URL_CLOUD,
-            ssl: true,
-        };
-    }
-
     return {
-        type: "local",
         connectionString: process.env.DATABASE_URL,
         ssl: true,
     };
-}
-
-function createMailTransport(): Transporter {
-    return nodemailer.createTransport({
-        host: process.env.MAIL_HOST || "smtp.gmail.com",
-        port: parseInt(process.env.MAIL_PORT || "587", 10),
-        secure: process.env.MAIL_SECURE === "true", // true for 465, false for 587
-        auth: {
-            user: process.env.MAIL_USER || "", // SMTP email
-            pass: process.env.MAIL_PASS || "", // SMTP password or App Password
-        },
-    });
 }
 
 const config: Config = {
@@ -77,8 +48,7 @@ const config: Config = {
         saltRounds: parseInt(process.env.AUTH_SALT_ROUNDS || "10", 10),
         accessTokenExpires: process.env.AUTH_ACCESS_TOKEN_EXPIRES || "15m",
         refreshTokenExpires: process.env.AUTH_REFRESH_TOKEN_EXPIRES || "7d",
-    },
-    mailer: createMailTransport()
+    }
 };
 
 function validateAuthConfig(auth: AuthConfig) {
@@ -101,19 +71,10 @@ function validateAuthConfig(auth: AuthConfig) {
 }
 // Validate required environment variables
 function validateConfig() {
-    const { database, auth } = config;
-    if (database.type === "cloud" && !database.connectionString) {
-        throw new Error("DATABASE_URL_CLOUD is required for cloud database");
+    const { database } = config;
+    if (!database.connectionString) {
+        throw new Error("DATABASE_URL are required for local database");
     }
-
-    if (database.type === "local" && !database.connectionString) {
-        throw new Error("DATABASE_URL_LOCAL are required for local database");
-    }
-
-    if (!process.env.MAIL_USER || !process.env.MAIL_PASS) {
-        throw new Error("MAIL_USER and MAIL_PASS are required for SMTP email sending");
-    }
-
 }
 
 validateAuthConfig(config.auth);

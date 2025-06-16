@@ -23,16 +23,16 @@ npx prisma db seed
 ```
 
 After seeding, a default account will be created:
-Email: master@master.com
-Password: Abc@12345
+- Email: master@master.com
+- Password: Abc@12345
 
 ## Scripts
-– Start the development server
+Start the development server
 ```bash
 npm run dev 
 ```
 
-– Open Prisma Studio to explore the database
+Open Prisma Studio to explore the database
 ```bash
 npx prisma studio
 ```

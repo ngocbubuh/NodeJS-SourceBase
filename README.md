@@ -29,6 +29,7 @@ After seeding, a default account will be created:
 ## Scripts
 Start the development server
 ```bash
+npm run build
 npm run dev 
 ```
 
